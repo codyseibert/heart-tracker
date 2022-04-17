@@ -6,11 +6,11 @@ export default function Home() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     fetch('/api/entries', {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({
-        isDairy: formData.get('isDairy'),
-        isSalty: formData.get('isSalty'),
-        symptoms: formData.get('symptoms'),
+        isDairy: formData.get('isDairy') === 'true',
+        isSalty: formData.get('isSalty') === 'true',
+        symptoms: parseInt(formData.get('symptoms')),
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +41,12 @@ export default function Home() {
           </label>
 
           <label>
-            <input type="radio" value="2" name="symptoms" />
+            <input
+              checked
+              type="radio"
+              value="2"
+              name="symptoms"
+            />
             Average
           </label>
 
@@ -55,7 +60,7 @@ export default function Home() {
             <input
               name="isDairy"
               type="checkbox"
-              value="false"
+              value="true"
             />
             Did you have dairy today?
           </label>
@@ -64,7 +69,7 @@ export default function Home() {
             <input
               name="isSalty"
               type="checkbox"
-              value="false"
+              value="true"
             />
             Did you have a lot of salt today?
           </label>
