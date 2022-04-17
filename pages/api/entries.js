@@ -1,5 +1,5 @@
-const Entry = require('../../api-lib/models/Entry');
-const connectToDb = require('../../api-lib/db');
+import Entry from '../../api-lib/models/Entry';
+import connectToDb from '../../api-lib/db';
 
 export default async function handler(req, res) {
   if (req.method === 'PUT') {

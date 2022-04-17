@@ -42,7 +42,7 @@ export default function Home() {
 
           <label>
             <input
-              checked
+              defaultChecked
               type="radio"
               value="2"
               name="symptoms"
