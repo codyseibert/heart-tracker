@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -9,6 +9,5 @@ const EntrySchema = new Schema({
   date: String,
 });
 
-module.exports =
-  mongoose.models.Entry ||
+export default mongoose.models.Entry ||
   mongoose.model('Entry', EntrySchema);
