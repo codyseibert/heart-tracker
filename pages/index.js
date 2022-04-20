@@ -21,7 +21,11 @@ export default function Home() {
       },
     })
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((todaysForm) => {
+        if (todaysForm) {
+          setForm(todaysForm);
+        }
+      });
   }, []);
 
   const handleSubmit = (event) => {
@@ -103,7 +107,7 @@ export default function Home() {
               name="isDairy"
               type="checkbox"
               checked={form.isDairy}
-              onChange={(e) =>
+              onChange={() =>
                 setForm({
                   ...form,
                   isDairy: !form.isDairy,
@@ -118,7 +122,7 @@ export default function Home() {
               name="isSalty"
               type="checkbox"
               checked={form.isSalty}
-              onChange={(e) =>
+              onChange={() =>
                 setForm({
                   ...form,
                   isSalty: !form.isSalty,

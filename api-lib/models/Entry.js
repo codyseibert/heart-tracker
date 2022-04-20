@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const EntrySchema = new Schema({
   symptoms: Number,
-  isDariy: Boolean,
+  isDairy: Boolean,
   isSalty: Boolean,
   date: String,
 });

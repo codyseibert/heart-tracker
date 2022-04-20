@@ -14,7 +14,7 @@ const handlePut = async (req, res) => {
   if (existingEntry) {
     Object.assign(existingEntry, {
       symptoms: req.body.symptoms,
-      isDariy: req.body.isDairy,
+      isDairy: req.body.isDairy,
       isSalty: req.body.isSalty,
     });
     await existingEntry.save();
@@ -22,7 +22,7 @@ const handlePut = async (req, res) => {
   } else {
     const entry = new Entry({
       symptoms: req.body.symptoms,
-      isDariy: req.body.isDairy,
+      isDairy: req.body.isDairy,
       isSalty: req.body.isSalty,
       date: todaysDate,
     });
