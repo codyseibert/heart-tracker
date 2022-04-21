@@ -40,22 +40,28 @@ export default function Home() {
     isSalty: true,
   });
 
+  const fetchSelectedDateFromApi = (dateToFetch) => {
+    getEntryByDate(formatDate(dateToFetch)).then((entry) =>
+      setForm(entry)
+    );
+  };
+
   const gotoPreviousDay = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() - 1);
     setSelectedDate(newDate);
+    fetchSelectedDateFromApi(newDate);
   };
 
   const gotoNextDay = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + 1);
     setSelectedDate(newDate);
+    fetchSelectedDateFromApi(newDate);
   };
 
   useEffect(() => {
-    getEntryByDate(formatDate(selectedDate)).then((entry) =>
-      setForm(entry)
-    );
+    fetchSelectedDateFromApi(selectedDate);
   }, []);
 
   const handleSubmit = (event) => {
