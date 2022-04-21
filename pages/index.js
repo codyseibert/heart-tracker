@@ -6,37 +6,61 @@ const SYMPTOM_GOOD = 3;
 const SYMPTOM_AVERAGE = 2;
 const SYMPTOM_BAD = 1;
 
+const formatDate = (dateToFormat) => {
+  return dateToFormat.toISOString().slice(0, 10);
+};
+
+const getEntryByDate = (YYYYMMDDString) => {
+  return fetch(`/api/entries/${YYYYMMDDString}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((res) => res.json());
+};
+
+const putEntryByDate = (YYYYMMDDString, form) => {
+  return fetch(`/api/entries/${YYYYMMDDString}`, {
+    method: 'PUT',
+    body: JSON.stringify(form),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((res) => res.json());
+};
+
 export default function Home() {
+  const [selectedDate, setSelectedDate] = useState(
+    new Date()
+  );
+
   const [form, setForm] = useState({
     symptoms: 1,
     isDairy: true,
     isSalty: true,
   });
 
+  const gotoPreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const gotoNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
   useEffect(() => {
-    fetch('/api/entries', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((todaysForm) => {
-        if (todaysForm) {
-          setForm(todaysForm);
-        }
-      });
+    getEntryByDate(formatDate(selectedDate)).then((entry) =>
+      setForm(entry)
+    );
   }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetch('/api/entries', {
-      method: 'PUT',
-      body: JSON.stringify(form),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    putEntryByDate(formatDate(selectedDate), form);
   };
 
   return (
@@ -51,6 +75,12 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+        <h2>
+          <button onClick={gotoPreviousDay}>{'<'}</button>
+          Selected Date: {formatDate(selectedDate)}
+          <button onClick={gotoNextDay}>{'>'}</button>
+        </h2>
+
         <form
           className={styles.symptomsForm}
           onSubmit={handleSubmit}

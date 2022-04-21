@@ -1,13 +1,13 @@
-import Entry from '../../api-lib/models/Entry';
-import connectToDb from '../../api-lib/db';
+import Entry from '../../../api-lib/models/Entry';
+import connectToDb from '../../../api-lib/db';
 
 const handlePut = async (req, res) => {
   await connectToDb();
-  // get today's date in format of YYYY-MM-DD
-  const todaysDate = new Date().toISOString().slice(0, 10);
+
+  const { dateString } = req.query;
 
   const existingEntry = await Entry.findOne({
-    date: todaysDate,
+    date: dateString,
   });
   let entryToReturn;
 
@@ -24,7 +24,7 @@ const handlePut = async (req, res) => {
       symptoms: req.body.symptoms,
       isDairy: req.body.isDairy,
       isSalty: req.body.isSalty,
-      date: todaysDate,
+      date: dateString,
     });
 
     await entry.save();
@@ -37,13 +37,19 @@ const handlePut = async (req, res) => {
 const handleGet = async (req, res) => {
   await connectToDb();
 
-  const todaysDate = new Date().toISOString().slice(0, 10);
+  const { dateString } = req.query;
 
   const existingEntry = await Entry.findOne({
-    date: todaysDate,
+    date: dateString,
   });
 
-  res.status(200).json(existingEntry);
+  let entryToReturn = existingEntry || {
+    symptoms: 2,
+    isDairy: false,
+    isSalty: false,
+  };
+
+  res.status(200).json(entryToReturn);
 };
 
 export default async function handler(req, res) {
