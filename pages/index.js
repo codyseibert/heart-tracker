@@ -1,6 +1,9 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { useEffect, useState } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import { BsFillCalendarEventFill } from 'react-icons/bs';
 
 const SYMPTOM_GOOD = 3;
 const SYMPTOM_AVERAGE = 2;
@@ -33,6 +36,11 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(
     new Date()
   );
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const gotoToday = () => {
+    setSelectedDate(new Date());
+  };
 
   const [form, setForm] = useState({
     symptoms: 1,
@@ -81,10 +89,26 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+        {showCalendar && (
+          <Calendar
+            onChange={(datePicked) => {
+              setSelectedDate(datePicked);
+              fetchSelectedDateFromApi(datePicked);
+              setShowCalendar(false);
+            }}
+          />
+        )}
+
         <h2>
           <button onClick={gotoPreviousDay}>{'<'}</button>
           Selected Date: {formatDate(selectedDate)}
           <button onClick={gotoNextDay}>{'>'}</button>
+          <button
+            onClick={() => setShowCalendar(!showCalendar)}
+          >
+            <BsFillCalendarEventFill />
+          </button>
+          <button onClick={gotoToday}>Go To Today</button>
         </h2>
 
         <form
