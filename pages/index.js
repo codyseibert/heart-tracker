@@ -2,7 +2,6 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 import { BsFillCalendarEventFill } from 'react-icons/bs';
 
 const SYMPTOM_GOOD = 3;
@@ -91,11 +90,15 @@ export default function Home() {
       <main className={styles.main}>
         {showCalendar && (
           <Calendar
+            className={styles.calendar}
             onChange={(datePicked) => {
               setSelectedDate(datePicked);
               fetchSelectedDateFromApi(datePicked);
               setShowCalendar(false);
             }}
+            tileClassName={({ date, view }) =>
+              'calendar-day'
+            }
           />
         )}
 
