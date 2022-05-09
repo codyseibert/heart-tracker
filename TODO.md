@@ -1,0 +1,6 @@
+- add notes to day entries
+- color the calendar based on sympotoms (green, yellow, red)
+- add more data entries
+- add export button
+- have graph displaying line graph of symptoms
+-

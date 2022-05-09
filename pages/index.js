@@ -12,6 +12,16 @@ const formatDate = (dateToFormat) => {
   return dateToFormat.toISOString().slice(0, 10);
 };
 
+const getEntriesInMonth = (YYYYMMDDString) => {
+  const yearMonth = YYYYMMDDString.slice(0, 7);
+  return fetch(`/api/entries?yearMonth=${yearMonth}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((res) => res.json());
+};
+
 const getEntryByDate = (YYYYMMDDString) => {
   return fetch(`/api/entries/${YYYYMMDDString}`, {
     method: 'GET',
@@ -36,6 +46,7 @@ export default function Home() {
     new Date()
   );
   const [showCalendar, setShowCalendar] = useState(false);
+  const [entriesOfMonth, setEntriesOfMonth] = useState([]);
 
   const gotoToday = () => {
     setSelectedDate(new Date());
@@ -50,6 +61,12 @@ export default function Home() {
   const fetchSelectedDateFromApi = (dateToFetch) => {
     getEntryByDate(formatDate(dateToFetch)).then((entry) =>
       setForm(entry)
+    );
+  };
+
+  const fetchEntriesOfMonthFromApi = (dateToFetch) => {
+    getEntriesInMonth(formatDate(selectedDate)).then(
+      (entries) => setEntriesOfMonth(entries)
     );
   };
 
@@ -69,11 +86,14 @@ export default function Home() {
 
   useEffect(() => {
     fetchSelectedDateFromApi(selectedDate);
+    fetchEntriesOfMonthFromApi(selectedDate);
   }, []);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    putEntryByDate(formatDate(selectedDate), form);
+    await putEntryByDate(formatDate(selectedDate), form);
+    // TODO: this is bad performance
+    await fetchEntriesOfMonthFromApi(selectedDate);
   };
 
   return (
@@ -96,9 +116,25 @@ export default function Home() {
               fetchSelectedDateFromApi(datePicked);
               setShowCalendar(false);
             }}
-            tileClassName={({ date, view }) =>
-              'calendar-day'
-            }
+            tileClassName={({ date, view }) => {
+              const formattedDate = formatDate(date);
+              const entry = entriesOfMonth.find(
+                (entry) => entry.date === formattedDate
+              );
+              if (entry) {
+                let symptoms;
+                if (entry.symptoms === SYMPTOM_GOOD) {
+                  symptoms = 'good';
+                } else if (
+                  entry.symptoms === SYMPTOM_AVERAGE
+                ) {
+                  symptoms = 'average';
+                } else if (entry.symptoms === SYMPTOM_BAD) {
+                  symptoms = 'bad';
+                }
+                return `calendar-${symptoms}-day`;
+              }
+            }}
           />
         )}
 

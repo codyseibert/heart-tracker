@@ -19,3 +19,15 @@ a {
 .react-calendar__month-view__days__day--weekend {
   color: black;
 }
+
+.calendar-good-day {
+  background-color: green;
+}
+
+.calendar-average-day {
+  background-color: yellow;
+}
+
+.calendar-bad-day {
+  background-color: red;
+}
