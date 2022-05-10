@@ -6,6 +6,7 @@ const EntrySchema = new Schema({
   symptoms: Number,
   isDairy: Boolean,
   isSalty: Boolean,
+  didExercise: Boolean,
   date: String,
 });
 

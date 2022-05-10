@@ -16,6 +16,7 @@ const handlePut = async (req, res) => {
       symptoms: req.body.symptoms,
       isDairy: req.body.isDairy,
       isSalty: req.body.isSalty,
+      didExercise: req.body.didExercise,
     });
     await existingEntry.save();
     entryToReturn = existingEntry;
@@ -24,6 +25,7 @@ const handlePut = async (req, res) => {
       symptoms: req.body.symptoms,
       isDairy: req.body.isDairy,
       isSalty: req.body.isSalty,
+      didExercise: req.body.didExercise,
       date: dateString,
     });
 
@@ -47,6 +49,7 @@ const handleGet = async (req, res) => {
     symptoms: 2,
     isDairy: false,
     isSalty: false,
+    didExercise: false,
   };
 
   res.status(200).json(entryToReturn);

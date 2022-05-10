@@ -2,7 +2,6 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
-import { BsFillCalendarEventFill } from 'react-icons/bs';
 
 const SYMPTOM_GOOD = 3;
 const SYMPTOM_AVERAGE = 2;
@@ -45,17 +44,13 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(
     new Date()
   );
-  const [showCalendar, setShowCalendar] = useState(false);
   const [entriesOfMonth, setEntriesOfMonth] = useState([]);
-
-  const gotoToday = () => {
-    setSelectedDate(new Date());
-  };
 
   const [form, setForm] = useState({
     symptoms: 1,
-    isDairy: true,
-    isSalty: true,
+    isDairy: false,
+    isSalty: false,
+    didExercise: false,
   });
 
   const fetchSelectedDateFromApi = (dateToFetch) => {
@@ -65,23 +60,9 @@ export default function Home() {
   };
 
   const fetchEntriesOfMonthFromApi = (dateToFetch) => {
-    getEntriesInMonth(formatDate(selectedDate)).then(
+    getEntriesInMonth(formatDate(dateToFetch)).then(
       (entries) => setEntriesOfMonth(entries)
     );
-  };
-
-  const gotoPreviousDay = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 1);
-    setSelectedDate(newDate);
-    fetchSelectedDateFromApi(newDate);
-  };
-
-  const gotoNextDay = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 1);
-    setSelectedDate(newDate);
-    fetchSelectedDateFromApi(newDate);
   };
 
   useEffect(() => {
@@ -92,7 +73,6 @@ export default function Home() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     await putEntryByDate(formatDate(selectedDate), form);
-    // TODO: this is bad performance
     await fetchEntriesOfMonthFromApi(selectedDate);
   };
 
@@ -108,13 +88,19 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        {showCalendar && (
+        <div>
           <Calendar
             className={styles.calendar}
             onChange={(datePicked) => {
               setSelectedDate(datePicked);
               fetchSelectedDateFromApi(datePicked);
-              setShowCalendar(false);
+            }}
+            onActiveStartDateChange={async ({
+              activeStartDate,
+            }) => {
+              await fetchEntriesOfMonthFromApi(
+                activeStartDate
+              );
             }}
             tileClassName={({ date, view }) => {
               const formattedDate = formatDate(date);
@@ -136,103 +122,108 @@ export default function Home() {
               }
             }}
           />
-        )}
+        </div>
 
-        <h2>
-          <button onClick={gotoPreviousDay}>{'<'}</button>
-          Selected Date: {formatDate(selectedDate)}
-          <button onClick={gotoNextDay}>{'>'}</button>
-          <button
-            onClick={() => setShowCalendar(!showCalendar)}
+        <div>
+          <form
+            className={styles.symptomsForm}
+            onSubmit={handleSubmit}
           >
-            <BsFillCalendarEventFill />
-          </button>
-          <button onClick={gotoToday}>Go To Today</button>
-        </h2>
+            <h3>Symptoms</h3>
+            <label>
+              <input
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    symptoms: SYMPTOM_GOOD,
+                  })
+                }
+                checked={form.symptoms === SYMPTOM_GOOD}
+                type="radio"
+                name="symptoms"
+              />
+              Feeling good
+            </label>
 
-        <form
-          className={styles.symptomsForm}
-          onSubmit={handleSubmit}
-        >
-          <h3>Symptoms</h3>
-          <label>
-            <input
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  symptoms: SYMPTOM_GOOD,
-                })
-              }
-              checked={form.symptoms === SYMPTOM_GOOD}
-              type="radio"
-              name="symptoms"
-            />
-            Feeling good
-          </label>
+            <label>
+              <input
+                type="radio"
+                checked={form.symptoms === SYMPTOM_AVERAGE}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    symptoms: SYMPTOM_AVERAGE,
+                  })
+                }
+                name="symptoms"
+              />
+              Average
+            </label>
 
-          <label>
-            <input
-              type="radio"
-              checked={form.symptoms === SYMPTOM_AVERAGE}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  symptoms: SYMPTOM_AVERAGE,
-                })
-              }
-              name="symptoms"
-            />
-            Average
-          </label>
+            <label>
+              <input
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    symptoms: SYMPTOM_BAD,
+                  })
+                }
+                checked={form.symptoms === SYMPTOM_BAD}
+                type="radio"
+                name="symptoms"
+              />
+              Bad
+            </label>
 
-          <label>
-            <input
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  symptoms: SYMPTOM_BAD,
-                })
-              }
-              checked={form.symptoms === SYMPTOM_BAD}
-              type="radio"
-              name="symptoms"
-            />
-            Bad
-          </label>
+            <h3>Data Points</h3>
+            <label>
+              <input
+                name="isDairy"
+                type="checkbox"
+                checked={form.isDairy}
+                onChange={() =>
+                  setForm({
+                    ...form,
+                    isDairy: !form.isDairy,
+                  })
+                }
+              />
+              Did you have dairy today?
+            </label>
 
-          <h3>Data Points</h3>
-          <label>
-            <input
-              name="isDairy"
-              type="checkbox"
-              checked={form.isDairy}
-              onChange={() =>
-                setForm({
-                  ...form,
-                  isDairy: !form.isDairy,
-                })
-              }
-            />
-            Did you have dairy today?
-          </label>
+            <label>
+              <input
+                name="isSalty"
+                type="checkbox"
+                checked={form.isSalty}
+                onChange={() =>
+                  setForm({
+                    ...form,
+                    isSalty: !form.isSalty,
+                  })
+                }
+              />
+              Did you have a lot of salt today?
+            </label>
 
-          <label>
-            <input
-              name="isSalty"
-              type="checkbox"
-              checked={form.isSalty}
-              onChange={() =>
-                setForm({
-                  ...form,
-                  isSalty: !form.isSalty,
-                })
-              }
-            />
-            Did you have a lot of salt today?
-          </label>
+            <label>
+              <input
+                name="didExercise"
+                type="checkbox"
+                checked={form.didExercise}
+                onChange={() =>
+                  setForm({
+                    ...form,
+                    didExercise: !form.didExercise,
+                  })
+                }
+              />
+              Did you exercise today?
+            </label>
 
-          <button type="submit">Save</button>
-        </form>
+            <button type="submit">Save</button>
+          </form>
+        </div>
       </main>
     </div>
   );
