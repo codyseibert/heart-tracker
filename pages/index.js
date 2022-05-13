@@ -40,6 +40,8 @@ const putEntryByDate = (YYYYMMDDString, form) => {
   }).then((res) => res.json());
 };
 
+import { dataPoints } from '../business/dataPoints';
+
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(
     new Date()
@@ -48,9 +50,9 @@ export default function Home() {
 
   const [form, setForm] = useState({
     symptoms: 1,
-    isDairy: false,
-    isSalty: false,
-    didExercise: false,
+    ...Object.keys(dataPoints).map((key) => ({
+      [key]: false,
+    })),
   });
 
   const fetchSelectedDateFromApi = (dateToFetch) => {
@@ -176,50 +178,24 @@ export default function Home() {
             </label>
 
             <h3>Data Points</h3>
-            <label>
-              <input
-                name="isDairy"
-                type="checkbox"
-                checked={form.isDairy}
-                onChange={() =>
-                  setForm({
-                    ...form,
-                    isDairy: !form.isDairy,
-                  })
-                }
-              />
-              Did you have dairy today?
-            </label>
-
-            <label>
-              <input
-                name="isSalty"
-                type="checkbox"
-                checked={form.isSalty}
-                onChange={() =>
-                  setForm({
-                    ...form,
-                    isSalty: !form.isSalty,
-                  })
-                }
-              />
-              Did you have a lot of salt today?
-            </label>
-
-            <label>
-              <input
-                name="didExercise"
-                type="checkbox"
-                checked={form.didExercise}
-                onChange={() =>
-                  setForm({
-                    ...form,
-                    didExercise: !form.didExercise,
-                  })
-                }
-              />
-              Did you exercise today?
-            </label>
+            {Object.entries(dataPoints).map(
+              ([key, entryText]) => (
+                <label>
+                  <input
+                    name={key}
+                    type="checkbox"
+                    checked={form[key]}
+                    onChange={() =>
+                      setForm({
+                        ...form,
+                        [key]: !form[key],
+                      })
+                    }
+                  />
+                  {entryText}
+                </label>
+              )
+            )}
 
             <button type="submit">Save</button>
           </form>

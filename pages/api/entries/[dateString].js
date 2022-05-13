@@ -1,5 +1,9 @@
 import Entry from '../../../api-lib/models/Entry';
 import connectToDb from '../../../api-lib/db';
+import { dataPoints } from '../../../business/dataPoints';
+import { pick } from 'lodash';
+
+const dataPointKeys = Object.keys(dataPoints);
 
 const handlePut = async (req, res) => {
   await connectToDb();
@@ -14,18 +18,14 @@ const handlePut = async (req, res) => {
   if (existingEntry) {
     Object.assign(existingEntry, {
       symptoms: req.body.symptoms,
-      isDairy: req.body.isDairy,
-      isSalty: req.body.isSalty,
-      didExercise: req.body.didExercise,
+      ...pick(req.body, dataPointKeys),
     });
     await existingEntry.save();
     entryToReturn = existingEntry;
   } else {
     const entry = new Entry({
       symptoms: req.body.symptoms,
-      isDairy: req.body.isDairy,
-      isSalty: req.body.isSalty,
-      didExercise: req.body.didExercise,
+      ...pick(req.body, dataPointKeys),
       date: dateString,
     });
 
@@ -47,9 +47,13 @@ const handleGet = async (req, res) => {
 
   let entryToReturn = existingEntry || {
     symptoms: 2,
-    isDairy: false,
-    isSalty: false,
-    didExercise: false,
+    ...dataPointKeys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: false,
+      }),
+      {}
+    ),
   };
 
   res.status(200).json(entryToReturn);

@@ -1,12 +1,18 @@
 import mongoose from 'mongoose';
 
+import { dataPoints } from '../../business/dataPoints';
+
 const Schema = mongoose.Schema;
 
 const EntrySchema = new Schema({
   symptoms: Number,
-  isDairy: Boolean,
-  isSalty: Boolean,
-  didExercise: Boolean,
+  ...Object.keys(dataPoints).reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: Boolean,
+    }),
+    {}
+  ),
   date: String,
 });
 
