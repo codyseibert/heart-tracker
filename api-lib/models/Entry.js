@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 
 const EntrySchema = new Schema({
   symptoms: Number,
+  notes: String,
   ...Object.keys(dataPoints).reduce(
     (acc, key) => ({
       ...acc,

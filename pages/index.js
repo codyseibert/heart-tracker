@@ -177,6 +177,20 @@ export default function Home() {
               Bad
             </label>
 
+            <label>
+              Notes
+              <input
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    notes: e.target.value,
+                  })
+                }
+                value={form.notes}
+                name="notes"
+              />
+            </label>
+
             <h3>Data Points</h3>
             {Object.entries(dataPoints).map(
               ([key, entryText]) => (
